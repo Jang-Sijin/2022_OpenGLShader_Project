@@ -35,6 +35,24 @@
     <None Include="Shaders\SolidRect.fs">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\SolidRectCopy.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SolidRectCopy.vs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture3_particle.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture3_particle.vs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture3_6particle.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture3_6particle.vs">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

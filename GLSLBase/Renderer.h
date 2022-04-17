@@ -21,6 +21,11 @@ public:
 	GLuint CreateBmpTexture(char * filePath);
 	   
 	void Test();
+	void Lecture2();
+	void MyTest();
+	void Lecture3();
+	void Lecture3_Particle();
+	void Lecture3_6ParticleAnimation5();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -29,6 +34,8 @@ private:
 	GLuint CompileShaders(char* filenameVS, char* filenameFS);
 	void CreateVertexBufferObjects(); 
 	unsigned char * Renderer::loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight);
+	void CreateParticle(int count);
+	void CreateParticleAnimation5(int count);
 
 	bool m_Initialized = false;
 	
@@ -50,5 +57,25 @@ private:
 
 	GLuint m_VBORect = 0;
 	GLuint m_SolidRectShader = 0;
-};
 
+	// 샘플2 VBO
+	GLuint m_VBOLecture2 = 0;
+
+	// 복사한 쉐이더 파일과 샘플3 제작을 위한 VBO를 추가한다.
+	GLuint m_Lecture3Shader = 0;
+	GLuint m_VBOLecture3 = 0;
+
+	// 쿼드로 만들 파티클 VertexBufferObject
+	GLuint m_VBOSingleParticleQuad = 0;
+	GLuint m_Lecture3ParticleShader = 0;
+
+	GLuint m_VBOManyParticle = 0;
+	GLuint m_VBOManyParticleVertexCount = 0;
+
+	// 쿼드로 만들 파티클 VertexBufferObject
+	GLuint m_VBOSingleParticleQuad1 = 0;
+	GLuint m_Lecture3ParticleShader1 = 0;
+
+	GLuint m_VBOManyParticle1 = 0;
+	GLuint m_VBOManyParticleVertexCount1 = 0;
+};

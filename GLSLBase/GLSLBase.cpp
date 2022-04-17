@@ -6,6 +6,9 @@ it under the terms of the What The Hell License. Do it plz.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY.
+
+Copyright 2022 Jang Sijin (Tech University of Korea)
+Based on the shader sample, Jang Sijin added and modified the shader.
 */
 
 #include "stdafx.h"
@@ -20,14 +23,20 @@ Renderer *g_Renderer = NULL;
 int g_WindowSizeX = 500;
 int g_WindowSizeY = 500;
 
+// 프레임 레이트가 없으면 계속 호출된다.
 void RenderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// Renderer Test
-	g_Renderer->Test();
+	// Renderer Test - maybe 60hz call
+	// g_Renderer->Test(); // Sample1
+	// g_Renderer->Lecture2(); // My Sample1
+	// g_Renderer->Lecture3(); // Lecture3 study
+	// g_Renderer->Lecture3_Particle(); // Lecture3-3 Particle test
+	g_Renderer->Lecture3_6ParticleAnimation5();
 
+	// double buffers
 	glutSwapBuffers();
 }
 
@@ -73,13 +82,14 @@ int main(int argc, char **argv)
 	// Initialize Renderer
 	g_Renderer = new Renderer(g_WindowSizeX, g_WindowSizeY);
 
+	// 이벤트에 따른 콜백 함수를 호출한다.
 	glutDisplayFunc(RenderScene);
 	glutIdleFunc(Idle);
 	glutKeyboardFunc(KeyInput);
 	glutMouseFunc(MouseInput);
 	glutSpecialFunc(SpecialKeyInput);
 
-	glutMainLoop();
+	glutMainLoop(); // 루프를 돈다.
 
 	delete g_Renderer;
 

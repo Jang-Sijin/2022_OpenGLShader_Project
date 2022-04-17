@@ -24,11 +24,18 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_WindowSizeX = windowSizeX;
 	m_WindowSizeY = windowSizeY;
 
-	//Load shaders
+	//Load shaders // 쉐이더 프로그램 ID
 	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
-	
+	m_Lecture3Shader = CompileShaders("./Shaders/SolidRectCopy.vs", "./Shaders/SolidRectCopy.fs"); // 복사한 쉐이더 컴파일 오류 체크
+	m_Lecture3ParticleShader = CompileShaders("./Shaders/lecture3_particle.vs", "./Shaders/lecture3_particle.fs");
+	m_Lecture3ParticleShader1 = CompileShaders("./Shaders/lecture3_6particle.vs", "./Shaders/lecture3_6particle.fs");
+
 	//Create VBOs
 	CreateVertexBufferObjects();
+
+	//Create Particles
+	CreateParticle(1000); // 파티클(쿼드)를 1000개 생성한다. lecture3_3
+	CreateParticleAnimation5(1000);
 
 	//Initialize camera settings
 	m_v3Camera_Position = glm::vec3(0.f, 0.f, 1000.f);
@@ -57,8 +64,10 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 void Renderer::CreateVertexBufferObjects()
 {
-	float rect[]
-		=
+	float myTest[18] = { 0, };
+
+	// 샘플1
+	float rect[] =
 	{
 		-0.5, -0.5, 0.f, -0.5, 0.5, 0.f, 0.5, 0.5, 0.f, //Triangle1
 		-0.5, -0.5, 0.f,  0.5, 0.5, 0.f, 0.5, -0.5, 0.f, //Triangle2
@@ -67,6 +76,395 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_VBORect);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+
+	// 샘플2
+	float lecture2[] =
+	{
+		0.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,
+		1.0, 1.0, 0.0,
+	}; // 9 floats array
+
+	glGenBuffers(1, &m_VBOLecture2);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lecture2), lecture2, GL_STATIC_DRAW);
+
+	// 샘플3
+	float lecture3[] =
+	{
+		0.0, 0.0, 0.0, 1, 0, 0, 1,
+		1.0, 0.0, 0.0, 0, 1, 0, 1,
+		1.0, 1.0, 0.0, 0, 0, 1, 1
+	}; // 9 position floats array + 12 RGBA color float array = 21 float array
+
+	glGenBuffers(1, &m_VBOLecture3);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture3);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lecture3), lecture3, GL_STATIC_DRAW);
+
+	// // 샘플3 - 파티클 생성 용도 - VBO준비 (lecture3_3 Study)
+	float particleSize = 0.1f;
+	float lecture3_singleParticle[] =
+	{
+		-particleSize, -particleSize, 0.0, 1, 1, 1, 1,
+		 particleSize,  particleSize, 0.0, 1, 1, 1, 1,
+		-particleSize,  particleSize, 0.0, 1, 1, 1, 1,
+
+		-particleSize, -particleSize, 0.0, 1, 1, 1, 1,
+		 particleSize, -particleSize, 0.0, 1, 1, 1, 1,
+		 particleSize,  particleSize, 0.0, 1, 1, 1, 1
+	}; // 삼각형 2개를 붙인 쿼드
+
+	glGenBuffers(1, &m_VBOSingleParticleQuad);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOSingleParticleQuad);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lecture3_singleParticle), lecture3_singleParticle, GL_STATIC_DRAW);
+}
+
+void Renderer::CreateParticle(int count)
+{
+	// count == 파티클의 형태[사각형(쿼드)]의 개수
+	int floatCount = count * (3 + 3 + 1 + 1) * 3 * 2; //(x, y, z) 3vertex , (vx, vy , vz) 3Velocity, 1EmitTime, 1lifeTime, 2Triangle = 1 Quad
+	float* particleVertices = new float[floatCount];
+	int vertexCount = count * 3 * 2;
+
+	int index = 0;
+	float particleSize = 0.01f;
+
+	for (int i = 0; i < count; i++)
+	{
+		float randomValueX = 0.f;
+		float randomValueY = 0.f;
+		float randomValueZ = 0.f;
+		float randomValueVX = 0.f;
+		float randomValueVY = 0.f;
+		float randomValueVZ = 0.f;
+		float randomEmitTime = 0.f;
+		float randomLifeTime = 0.f;
+
+		randomValueX = ((float)rand() / (float)RAND_MAX - 0.5f) * 2.f; //-1~1
+		randomValueY = ((float)rand() / (float)RAND_MAX - 0.5f) * 2.f; //-1~1
+		randomValueZ = 0.f;
+		randomValueVX = ((float)rand() / (float)RAND_MAX - 0.5f) * 2.f; //-1~1
+		randomValueVY = ((float)rand() / (float)RAND_MAX - 0.5f) * 2.f; //-1~1
+		randomValueVZ = 0.f;
+		randomEmitTime = ((float)rand() / (float)RAND_MAX) * 5.f;
+		randomLifeTime = ((float)rand() / (float)RAND_MAX) * 0.5f;
+		
+		//v0
+		particleVertices[index] = -particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = -particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		//v1
+		particleVertices[index] = particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = -particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		//v2
+		particleVertices[index] = particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		//v3
+		particleVertices[index] = -particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = -particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		//v4
+		particleVertices[index] = particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		//v5
+		particleVertices[index] = -particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+	}
+	glGenBuffers(1, &m_VBOManyParticle);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * floatCount, particleVertices, GL_STATIC_DRAW);
+	m_VBOManyParticleVertexCount = vertexCount;
+	delete[] particleVertices;
+}
+
+void Renderer::CreateParticleAnimation5(int count)
+{
+	// count == 파티클의 형태[사각형(쿼드)]의 개수
+	int floatCount = count * (3 + 3 + 1 + 1 + 1 + 1) * 3 * 2; // (x, y, z, vx, vy, vz, emit, life, amp, period)
+	float* particleVertices = new float[floatCount];
+	int vertexCount = count * 3 * 2;
+
+	int index = 0;
+	float particleSize = 0.01f;
+
+	for (int i = 0; i < count; i++)
+	{
+		float randomValueX = 0.f;
+		float randomValueY = 0.f;
+		float randomValueZ = 0.f;
+		float randomValueVX = 0.f;
+		float randomValueVY = 0.f;
+		float randomValueVZ = 0.f;
+		float randomEmitTime = 0.f;
+		float randomLifeTime = 0.f;
+		float randomAmp = 0.f;
+		float randomPeriod = 0.f;
+
+		randomValueX = 0.f;
+		randomValueY = 0.f;
+		randomValueZ = 0.f;
+		randomValueVX = 1.f;
+		randomValueVY = 0.f;
+		randomValueVZ = 0.f;
+		randomEmitTime = ((float)rand() / (float)RAND_MAX) * 5.f;
+		randomLifeTime = 1.f;
+		randomAmp = ((float)rand() / (float)RAND_MAX) * 0.2f - 0.1f; // (-0.1 ~ 0.1)
+		randomPeriod = ((float)rand() / (float)RAND_MAX) * 2.f; // (0~2)
+
+		//v0
+		particleVertices[index] = -particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = -particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		particleVertices[index] = randomAmp;
+		index++; //Amp
+		particleVertices[index] = randomPeriod;
+		index++; //Period
+
+		//v1
+		particleVertices[index] = particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = -particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		particleVertices[index] = randomAmp;
+		index++; //Amp
+		particleVertices[index] = randomPeriod;
+		index++; //Period
+
+		//v2
+		particleVertices[index] = particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		particleVertices[index] = randomAmp;
+		index++; //Amp
+		particleVertices[index] = randomPeriod;
+		index++; //Period
+
+		//v3
+		particleVertices[index] = -particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = -particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		particleVertices[index] = randomAmp;
+		index++; //Amp
+		particleVertices[index] = randomPeriod;
+		index++; //Period
+
+		//v4
+		particleVertices[index] = particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		particleVertices[index] = randomAmp;
+		index++; //Amp
+		particleVertices[index] = randomPeriod;
+		index++; //Period
+
+		//v5
+		particleVertices[index] = -particleSize / 2.f + randomValueX;
+		index++;
+		particleVertices[index] = particleSize / 2.f + randomValueY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Position XYZ
+
+		particleVertices[index] = randomValueVX;
+		index++;
+		particleVertices[index] = randomValueVY;
+		index++;
+		particleVertices[index] = 0.f;
+		index++; //Velocity XYZ
+
+		particleVertices[index] = randomEmitTime;
+		index++; //EmitTime
+		particleVertices[index] = randomLifeTime;
+		index++; //LifeTime
+
+		particleVertices[index] = randomAmp;
+		index++; //Amp
+		particleVertices[index] = randomPeriod;
+		index++; //Period
+	}
+	glGenBuffers(1, &m_VBOManyParticle1);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle1);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * floatCount, particleVertices, GL_STATIC_DRAW);
+	m_VBOManyParticleVertexCount1 = vertexCount;
+	delete[] particleVertices;
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -104,7 +502,7 @@ void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
 	glAttachShader(ShaderProgram, ShaderObj);
 }
 
-bool Renderer::ReadFile(char* filename, std::string *target)
+bool Renderer::ReadFile(char* filename, std::string* target)
 {
 	std::ifstream file(filename);
 	if (file.fail())
@@ -178,7 +576,7 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 
 	return ShaderProgram;
 }
-unsigned char * Renderer::loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight)
+unsigned char* Renderer::loadBMPRaw(const char* imagepath, unsigned int& outWidth, unsigned int& outHeight)
 {
 	std::cout << "Loading bmp file " << imagepath << " ... " << std::endl;
 	outWidth = -1;
@@ -188,10 +586,10 @@ unsigned char * Renderer::loadBMPRaw(const char * imagepath, unsigned int& outWi
 	unsigned int dataPos;
 	unsigned int imageSize;
 	// Actual RGB data
-	unsigned char * data;
+	unsigned char* data;
 
 	// Open the file
-	FILE * file = NULL;
+	FILE* file = NULL;
 	fopen_s(&file, imagepath, "rb");
 	if (!file)
 	{
@@ -245,7 +643,7 @@ unsigned char * Renderer::loadBMPRaw(const char * imagepath, unsigned int& outWi
 	return data;
 }
 
-GLuint Renderer::CreatePngTexture(char * filePath)
+GLuint Renderer::CreatePngTexture(char* filePath)
 {
 	//Load Pngs: Load file and decode image.
 	std::vector<unsigned char> image;
@@ -269,11 +667,11 @@ GLuint Renderer::CreatePngTexture(char * filePath)
 	return temp;
 }
 
-GLuint Renderer::CreateBmpTexture(char * filePath)
+GLuint Renderer::CreateBmpTexture(char* filePath)
 {
 	//Load Bmp: Load file and decode image.
 	unsigned int width, height;
-	unsigned char * bmp
+	unsigned char* bmp
 		= loadBMPRaw(filePath, width, height);
 
 	if (bmp == NULL)
@@ -294,16 +692,173 @@ GLuint Renderer::CreateBmpTexture(char * filePath)
 	return temp;
 }
 
-void Renderer::Test()
+void Renderer::Test() // 렌더링 예시 1 (그리는 부분)
 {
 	glUseProgram(m_SolidRectShader);
 
 	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
 	glEnableVertexAttribArray(attribPosition);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
 	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(attribPosition);
+}
+
+void Renderer::Lecture2() // 렌더링 예시 2 (그리는 부분)
+{
+	glUseProgram(m_SolidRectShader);
+
+	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture2); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glDisableVertexAttribArray(attribPosition);
+}
+
+void Renderer::MyTest() // 렌더링 예시 3 (그리는 부분)
+{
+	glUseProgram(m_SolidRectShader);
+
+	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture2); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glDisableVertexAttribArray(attribPosition);
+}
+
+float gTime = 1.f; // 시간에 따른 컬러값 변화를 주기 위함.
+
+void Renderer::Lecture3() // 문제가 있네
+{
+	GLuint shader = m_Lecture3Shader; // 쉐이더가 1개이면 깔끔하게 shader라는 변수를 만들어서 사용하는 것이 보기에 편할 것.
+	glUseProgram(shader);
+
+	int attribPosition = glGetAttribLocation(shader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture3); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0); // 좌표 (x,y,z) 총 3개
+
+	int attribColor = glGetAttribLocation(shader, "a_Color");
+	glEnableVertexAttribArray(attribColor);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOLecture3); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLuint*)(sizeof(float) * 3)); // 앞에 좌표 총 3개 뒤에 시작해야 한다.
+
+	// 시간이라는 외부 입력 (변화를) 쉐이더를 통해 전달했다. (vertex shader에 전달)
+	int uniformLocTime = glGetUniformLocation(shader, "u_Time"); // 보통 unsigned int로 쓰기도 하는데 int로 설정하면 오류났을 때 -1값으로 나오기 때문에 int형으로 사용하는 것 또한 추천 // 안쓰고 있으면 -1값(오류)이 발생
+	glUniform1f(uniformLocTime, gTime); // 런타임 중 유니폼으로 넘긴 값이 -1으로 되어있으면 외부 입력이 실패했다는 이야기이다.
+
+	int unifromLocColor = glGetUniformLocation(shader, "u_Color"); // 색상 넣어주기
+	glUniform4f(unifromLocColor, 1, 1, 1, 1); // RGBA(1,1,1,1)
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	gTime -= 0.01f;
+	if (gTime < 0.f)
+	{
+		gTime = 1.f;
+	}
+
+	glDisableVertexAttribArray(attribPosition);
+}
+
+void Renderer::Lecture3_Particle()
+{
+	GLuint shader = m_Lecture3ParticleShader; // 쉐이더가 1개이면 깔끔하게 shader라는 변수를 만들어서 사용하는 것이 보기에 편할 것.
+	glUseProgram(shader);
+
+	int attribPosition = glGetAttribLocation(shader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0); // 좌표 (x,y,z) 총 3개 // 2번째 인자의 크기 3과 같다면 sizeof(float) * 3이 아닌 0으로 설정해도 문제없이 작동한다.
+
+	int attribVelocity = glGetAttribLocation(shader, "a_Velocity");
+	glEnableVertexAttribArray(attribVelocity);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribVelocity, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (GLuint*)(sizeof(float) * 3));
+
+	int attribEmitTime = glGetAttribLocation(shader, "a_EmitTime");
+	glEnableVertexAttribArray(attribEmitTime);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle);
+	glVertexAttribPointer(attribEmitTime, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (GLuint*)(sizeof(float) * 6));
+
+	int attribLifeTime = glGetAttribLocation(shader, "a_LifeTime");
+	glEnableVertexAttribArray(attribLifeTime);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle);
+	glVertexAttribPointer(attribLifeTime, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (GLuint*)(sizeof(float) * 7));
+
+
+	// 시간이라는 외부 입력 (변화를) 쉐이더를 통해 전달했다. (vertex shader에 전달)
+	int uniformLocTime = glGetUniformLocation(shader, "u_Time"); // 보통 unsigned int로 쓰기도 하는데 int로 설정하면 오류났을 때 -1값으로 나오기 때문에 int형으로 사용하는 것 또한 추천 // 안쓰고 있으면 -1값(오류)이 발생
+	glUniform1f(uniformLocTime, gTime); // 런타임 중 유니폼으로 넘긴 값이 -1으로 되어있으면 외부 입력이 실패했다는 이야기이다.
+
+	int uniformAccel = glGetUniformLocation(shader, "u_Accel");
+	glUniform3f(uniformAccel, std::sin(gTime), std::cos(gTime), 0.0);
+
+
+	glDrawArrays(GL_TRIANGLES, 0, m_VBOManyParticleVertexCount); // 3개 * 2 = 정점 3개를 하나의 삼각형으로 그리고 이를 삼각형 2개로 이어 만들어본다.
+	
+	float addTime = 0.001f;
+	gTime += addTime;
+
+	glDisableVertexAttribArray(attribPosition);
+}
+
+void Renderer::Lecture3_6ParticleAnimation5()
+{
+	GLuint shader = m_Lecture3ParticleShader1; // 쉐이더가 1개이면 깔끔하게 shader라는 변수를 만들어서 사용하는 것이 보기에 편할 것.
+	glUseProgram(shader);
+
+	int attribPosition = glGetAttribLocation(shader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle1); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, 0); // 좌표 (x,y,z) 총 3개 // 2번째 인자의 크기 3과 같다면 sizeof(float) * 3이 아닌 0으로 설정해도 문제없이 작동한다.
+
+	int attribVelocity = glGetAttribLocation(shader, "a_Velocity");
+	glEnableVertexAttribArray(attribVelocity);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle1); // 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glVertexAttribPointer(attribVelocity, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLuint*)(sizeof(float) * 3));
+
+	int attribEmitTime = glGetAttribLocation(shader, "a_EmitTime");
+	glEnableVertexAttribArray(attribEmitTime);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle1);
+	glVertexAttribPointer(attribEmitTime, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLuint*)(sizeof(float) * 6));
+
+	int attribLifeTime = glGetAttribLocation(shader, "a_LifeTime");
+	glEnableVertexAttribArray(attribLifeTime);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle1);
+	glVertexAttribPointer(attribLifeTime, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLuint*)(sizeof(float) * 7));
+
+	int attribAmpTime = glGetAttribLocation(shader, "a_AmpTime");
+	glEnableVertexAttribArray(attribAmpTime);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle1);
+	glVertexAttribPointer(attribAmpTime, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLuint*)(sizeof(float) * 8));
+
+	int attribPeriodTime = glGetAttribLocation(shader, "a_PeriodTime");
+	glEnableVertexAttribArray(attribPeriodTime);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle1);
+	glVertexAttribPointer(attribPeriodTime, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (GLuint*)(sizeof(float) * 9));
+
+
+	// 시간이라는 외부 입력 (변화를) 쉐이더를 통해 전달했다. (vertex shader에 전달)
+	int uniformLocTime = glGetUniformLocation(shader, "u_Time"); // 보통 unsigned int로 쓰기도 하는데 int로 설정하면 오류났을 때 -1값으로 나오기 때문에 int형으로 사용하는 것 또한 추천 // 안쓰고 있으면 -1값(오류)이 발생
+	glUniform1f(uniformLocTime, gTime); // 런타임 중 유니폼으로 넘긴 값이 -1으로 되어있으면 외부 입력이 실패했다는 이야기이다.
+
+	int uniformAccel = glGetUniformLocation(shader, "u_Accel");
+	glUniform3f(uniformAccel, 0.0, 0.0, 0.0);
+
+
+	glDrawArrays(GL_TRIANGLES, 0, m_VBOManyParticleVertexCount1); // 3개 * 2 = 정점 3개를 하나의 삼각형으로 그리고 이를 삼각형 2개로 이어 만들어본다.
+
+	float addTime = 0.01f;
+	gTime += addTime;
 
 	glDisableVertexAttribArray(attribPosition);
 }
