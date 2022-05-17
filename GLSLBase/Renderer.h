@@ -26,6 +26,10 @@ public:
 	void Lecture3();
 	void Lecture3_Particle();
 	void Lecture3_6ParticleAnimation5();
+	void Lecture3_7ParticleAnimation5_Transform();
+	void Lecture4_1();
+	void Lecture4_2();
+	void Lecture4_3();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -36,6 +40,10 @@ private:
 	unsigned char * Renderer::loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight);
 	void CreateParticle(int count);
 	void CreateParticleAnimation5(int count);
+	void CreateParticleAnimation5_Transform(int count);
+	void CreateVertexBufferObjectsLecture4_1();
+	void CreateParticleAnimation_Lecture4_2(int count);
+	void CreateParticleAnimation_Lecture4_3(int count);
 
 	bool m_Initialized = false;
 	
@@ -72,10 +80,28 @@ private:
 	GLuint m_VBOManyParticle = 0;
 	GLuint m_VBOManyParticleVertexCount = 0;
 
+	GLuint m_VBOManyParticle1 = 0;
+	GLuint m_VBOManyParticleVertexCount1 = 0;
+
+	GLuint m_VBOManyParticle2 = 0;
+	GLuint m_VBOManyParticleVertexCount2 = 0;
+
 	// 쿼드로 만들 파티클 VertexBufferObject
 	GLuint m_VBOSingleParticleQuad1 = 0;
 	GLuint m_Lecture3ParticleShader1 = 0;
+	GLuint m_Lecture3ParticleShader2 = 0;
 
-	GLuint m_VBOManyParticle1 = 0;
-	GLuint m_VBOManyParticleVertexCount1 = 0;
+	// 화면에 커다란 사각형 그리기 (색은 흰색으로) Lecture4_0
+	GLuint m_VBOSingleParticleQuadLecture4_1 = 0;
+	GLuint m_ParticleShaderLectrue4_1 = 0;
+
+	// Lecture4_2
+	GLuint m_VBOManyParticle_Lecture4_2 = 0;
+	GLuint m_ShaderParticle_Lecture4_2 = 0;
+	GLuint m_VBOManyParticleVertexCount_Lecture4_2 = 0;
+
+	// Lecture4_3
+	GLuint m_VBOManyParticle_Lecture4_3 = 0;
+	GLuint m_ShaderParticle_Lecture4_3 = 0;
+	GLuint m_VBOManyParticleVertexCount_Lecture4_3 = 0;
 };

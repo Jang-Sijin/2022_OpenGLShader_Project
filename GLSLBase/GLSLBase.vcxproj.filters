@@ -53,9 +53,30 @@
     <None Include="Shaders\lecture3_6particle.vs">
       <Filter>Shader</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <None Include="Shaders\lecture3_7particle.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture3_7particle.vs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_1.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_1.vs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_2particle.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_2particle.vs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_3particle.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_3particle.vs">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

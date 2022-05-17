@@ -153,9 +153,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="LoadPng.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="stdafx.h" />
@@ -175,8 +172,16 @@
   <ItemGroup>
     <None Include="Shaders\lecture3_6particle.fs" />
     <None Include="Shaders\lecture3_6particle.vs" />
+    <None Include="Shaders\lecture3_7particle.fs" />
+    <None Include="Shaders\lecture3_7particle.vs" />
     <None Include="Shaders\lecture3_particle.fs" />
     <None Include="Shaders\lecture3_particle.vs" />
+    <None Include="Shaders\lecture4_1.fs" />
+    <None Include="Shaders\lecture4_1.vs" />
+    <None Include="Shaders\lecture4_2particle.fs" />
+    <None Include="Shaders\lecture4_2particle.vs" />
+    <None Include="Shaders\lecture4_3particle.fs" />
+    <None Include="Shaders\lecture4_3particle.vs" />
     <None Include="Shaders\SolidRect.fs" />
     <None Include="Shaders\SolidRect.vs" />
     <None Include="Shaders\SolidRectCopy.fs" />

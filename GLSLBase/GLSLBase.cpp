@@ -34,8 +34,12 @@ void RenderScene(void)
 	// g_Renderer->Lecture2(); // My Sample1
 	// g_Renderer->Lecture3(); // Lecture3 study
 	// g_Renderer->Lecture3_Particle(); // Lecture3-3 Particle test
-	g_Renderer->Lecture3_6ParticleAnimation5();
-
+	// g_Renderer->Lecture3_6ParticleAnimation5();
+	// g_Renderer->Lecture3_7ParticleAnimation5_Transform();
+	// g_Renderer->Lecture4_1();
+	// g_Renderer->Lecture4_2();
+	g_Renderer->Lecture4_3();
+	
 	// double buffers
 	glutSwapBuffers();
 }
