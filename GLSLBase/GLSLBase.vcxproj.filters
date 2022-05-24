@@ -77,6 +77,18 @@
     <None Include="Shaders\lecture4_3particle.vs">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\lecture4_4particle.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_4particle.vs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_5particle.fs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\lecture4_5particle.vs">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

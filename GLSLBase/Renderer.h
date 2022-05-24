@@ -30,6 +30,8 @@ public:
 	void Lecture4_1();
 	void Lecture4_2();
 	void Lecture4_3();
+	void Lecture4_4();
+	void Lecture4_5();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -44,6 +46,8 @@ private:
 	void CreateVertexBufferObjectsLecture4_1();
 	void CreateParticleAnimation_Lecture4_2(int count);
 	void CreateParticleAnimation_Lecture4_3(int count);
+	void CreateParticleAnimation_Lecture4_4(int count);
+	void CreateParticleAnimation_Lecture4_5(int count);
 
 	bool m_Initialized = false;
 	
@@ -104,4 +108,18 @@ private:
 	GLuint m_VBOManyParticle_Lecture4_3 = 0;
 	GLuint m_ShaderParticle_Lecture4_3 = 0;
 	GLuint m_VBOManyParticleVertexCount_Lecture4_3 = 0;
+
+	// Lecture4_4
+	GLuint m_VBOManyParticle_Lecture4_4 = 0;
+	GLuint m_ShaderParticle_Lecture4_4 = 0;
+	GLuint m_VBOManyParticleVertexCount_Lecture4_4 = 0;
+
+	// Lecture4_4
+	GLuint m_VBOManyParticle_Lecture4_5 = 0;
+	GLuint m_ShaderParticle_Lecture4_5 = 0;
+	GLuint m_VBOManyParticleVertexCount_Lecture4_5 = 0;
+	// Lecture4_5 - Vertex Shader Input Data Packing
+	GLuint m_VBOPack0_Pos = 0;
+	GLuint m_VBOPack0_Color = 0;
+	GLuint m_VBOPack1 = 0;
 };

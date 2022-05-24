@@ -38,7 +38,9 @@ void RenderScene(void)
 	// g_Renderer->Lecture3_7ParticleAnimation5_Transform();
 	// g_Renderer->Lecture4_1();
 	// g_Renderer->Lecture4_2();
-	g_Renderer->Lecture4_3();
+	// g_Renderer->Lecture4_3();
+	// g_Renderer->Lecture4_4();
+	g_Renderer->Lecture4_5();
 	
 	// double buffers
 	glutSwapBuffers();

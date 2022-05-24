@@ -33,6 +33,8 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_ParticleShaderLectrue4_1 = CompileShaders("./Shaders/lecture4_1.vs", "./Shaders/lecture4_1.fs");
 	m_ShaderParticle_Lecture4_2 = CompileShaders("./Shaders/lecture4_2particle.vs", "./Shaders/lecture4_2particle.fs");
 	m_ShaderParticle_Lecture4_3 = CompileShaders("./Shaders/lecture4_3particle.vs", "./Shaders/lecture4_3particle.fs");
+	m_ShaderParticle_Lecture4_4 = CompileShaders("./Shaders/lecture4_4particle.vs", "./Shaders/lecture4_4particle.fs");
+	m_ShaderParticle_Lecture4_5 = CompileShaders("./Shaders/lecture4_5particle.vs", "./Shaders/lecture4_5particle.fs");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -49,6 +51,10 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	CreateParticleAnimation_Lecture4_2(1000);
 	// Lecture4_3 - Create Particles - Vertex Shader & Fragment Shader
 	CreateParticleAnimation_Lecture4_3(1000);
+	// Lecture4_4 - Create Particles - Vertex Shader & Fragment Shader
+	CreateParticleAnimation_Lecture4_4(1000);
+	// Lecture4_4 - Create Particles - Vertex Shader Input Data Packing
+	CreateParticleAnimation_Lecture4_5(1000);
 
 	//Initialize camera settings
 	m_v3Camera_Position = glm::vec3(0.f, 0.f, 1000.f);
@@ -1062,6 +1068,105 @@ void Renderer::CreateParticleAnimation_Lecture4_3(int count)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(singleParticleVertexCountLecture4_3), singleParticleVertexCountLecture4_3, GL_STATIC_DRAW);
 }
 
+void Renderer::CreateParticleAnimation_Lecture4_4(int count)
+{
+	// 화면에 커다란 사각형 그리기(색은 흰색으로) Lecture 4_1
+	// Min(-0.5, -0.5), Max(0.5, 0.5)
+	float particleSize = 0.5f;
+	float singleParticleVertexCountLecture4_4[] =
+	{
+		-particleSize, -particleSize, 0.0, 1, 1, 1, 1, // x, y, z, r, g, b, a --> AttribPointer
+		 particleSize,  particleSize, 0.0, 1, 1, 1, 1,
+		-particleSize,  particleSize, 0.0, 1, 1, 1, 1,
+
+		-particleSize, -particleSize, 0.0, 1, 1, 1, 1,
+		 particleSize, -particleSize, 0.0, 1, 1, 1, 1,
+		 particleSize,  particleSize, 0.0, 1, 1, 1, 1
+	}; // 삼각형 2개를 붙인 쿼드
+
+	glGenBuffers(1, &m_VBOManyParticle_Lecture4_4);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle_Lecture4_4);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(singleParticleVertexCountLecture4_4), singleParticleVertexCountLecture4_4, GL_STATIC_DRAW);
+}
+
+void Renderer::CreateParticleAnimation_Lecture4_5(int count)
+{
+	// 화면에 커다란 사각형 그리기(색은 흰색으로) Lecture 4_1
+	// Min(-0.5, -0.5), Max(0.5, 0.5)
+	float particleSize = 0.5f;
+	float singleParticleVertexCountLecture4_5[] =
+	{
+		-particleSize, -particleSize, 0.0, 1, 1, 1, 1, // x, y, z, r, g, b, a --> AttribPointer
+		 particleSize,  particleSize, 0.0, 1, 1, 1, 1,
+		-particleSize,  particleSize, 0.0, 1, 1, 1, 1,
+
+		-particleSize, -particleSize, 0.0, 1, 1, 1, 1,
+		 particleSize, -particleSize, 0.0, 1, 1, 1, 1,
+		 particleSize,  particleSize, 0.0, 1, 1, 1, 1
+	}; // 삼각형 2개를 붙인 쿼드
+
+	glGenBuffers(1, &m_VBOManyParticle_Lecture4_5);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle_Lecture4_5);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(singleParticleVertexCountLecture4_5), singleParticleVertexCountLecture4_5, GL_STATIC_DRAW);
+
+
+	// Vertex - Position
+	float singleParticleVertexPositionCountLecture4_5[] =
+	{
+		-particleSize, -particleSize, 0.0,
+		 particleSize,  particleSize, 0.0,
+		-particleSize,  particleSize, 0.0,
+
+		-particleSize, -particleSize, 0.0,
+		 particleSize, -particleSize, 0.0,
+		 particleSize,  particleSize, 0.0,
+	}; // 삼각형 2개를 붙인 쿼드 (x, y, z) 좌표
+
+	glGenBuffers(1, &m_VBOPack0_Pos);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOPack0_Pos);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(singleParticleVertexPositionCountLecture4_5), singleParticleVertexPositionCountLecture4_5, GL_STATIC_DRAW);
+
+	// Vertex - Color
+	float singleParticleVertexColorCountLecture4_5[] =
+	{
+		1, 1, 1, 1,
+		1, 1, 1, 1,
+		1, 1, 1, 1,
+		1, 1, 1, 1,
+		1, 1, 1, 1,
+		1, 1, 1, 1,
+		1, 1, 1, 1,
+	}; // 삼각형 2개를 붙인 쿼드 (x, y, z) 좌표
+
+	glGenBuffers(1, &m_VBOPack0_Color);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOPack0_Color);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(singleParticleVertexColorCountLecture4_5), singleParticleVertexColorCountLecture4_5, GL_STATIC_DRAW);
+
+	// Vertex - Position & Color
+	float singleParticleVertexPositionColorCountLecture4_5[] =
+	{
+		-particleSize, -particleSize, 0.0,
+		 particleSize,  particleSize, 0.0,
+		-particleSize,  particleSize, 0.0,
+
+		-particleSize, -particleSize, 0.0,
+		 particleSize, -particleSize, 0.0,
+		 particleSize,  particleSize, 0.0,
+
+		 1, 1, 1, 1,
+		 1, 1, 1, 1,
+		 1, 1, 1, 1,
+
+		 1, 1, 1, 1,
+		 1, 1, 1, 1,
+		 1, 1, 1, 1
+	}; // 삼각형 2개를 붙인 쿼드
+
+	glGenBuffers(1, &m_VBOPack1);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOPack1);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(singleParticleVertexPositionColorCountLecture4_5), singleParticleVertexPositionColorCountLecture4_5, GL_STATIC_DRAW);
+}
+
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
 {
 	//쉐이더 오브젝트 생성
@@ -1638,6 +1743,87 @@ void Renderer::Lecture4_3()
 	glEnableVertexAttribArray(attribColor);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle_Lecture4_3);
 	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLuint*)(sizeof(float) * 3));
+
+	int uniformPoints = glGetUniformLocation(shader, "u_Points");
+	glUniform3fv(uniformPoints, 10, g_points); // v: array형태로 넘기겠다.
+
+	int uniformStartTime = glGetUniformLocation(shader, "u_Time");
+	glUniform1f(uniformStartTime, g_startTime); // v: array형태로 넘기겠다.
+
+	g_startTime += 0.001;
+
+	glDrawArrays(GL_TRIANGLES, 0, 6); // 총 6개의 정점(사각형 쿼드 1개)을 그린다.
+
+	glDisableVertexAttribArray(attribPosition);
+}
+
+void Renderer::Lecture4_4()
+{
+	GLuint shader = m_ShaderParticle_Lecture4_4;
+	glUseProgram(shader);
+
+	int attribPosition = glGetAttribLocation(shader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	// 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle_Lecture4_4);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0);
+
+	int attribColor = glGetAttribLocation(shader, "a_Color");
+	glEnableVertexAttribArray(attribColor);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle_Lecture4_4);
+	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLuint*)(sizeof(float) * 3));
+
+	int uniformPoints = glGetUniformLocation(shader, "u_Points");
+	glUniform3fv(uniformPoints, 10, g_points); // v: array형태로 넘기겠다.
+
+	int uniformStartTime = glGetUniformLocation(shader, "u_Time");
+	glUniform1f(uniformStartTime, g_startTime); // v: array형태로 넘기겠다.
+
+	g_startTime += 0.001;
+
+	glDrawArrays(GL_TRIANGLES, 0, 6); // 총 6개의 정점(사각형 쿼드 1개)을 그린다.
+
+	glDisableVertexAttribArray(attribPosition);
+}
+
+void Renderer::Lecture4_5()
+{
+	GLuint shader = m_ShaderParticle_Lecture4_5;
+	glUseProgram(shader);
+
+	//// [1. 버텍스 셰이더 입력 데이터 패킹 - 포지션, 색상을 각각의 Array로 패킹하여 셰이더로 넘겨준다.]
+	//int attribPosition = glGetAttribLocation(shader, "a_Position");
+	//glEnableVertexAttribArray(attribPosition);
+	//// 굳이 안해줘도 될 부분. 마지막으로 바인드가 되기는 했을테니... 하지만 혹시나 꼬였을 가능성이 있기 때문에 한번 더 해준 것이다.
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBOPack0_Pos);
+	//glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	//
+	//int attribColor = glGetAttribLocation(shader, "a_Color");
+	//glEnableVertexAttribArray(attribColor);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBOPack0_Color);
+	//glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+
+	//// [2. 버텍스 셰이더 입력 데이터 패킹 - 포지션, 색상을 동일한 Array로 패킹하여 셰이더로 넘겨준다.]
+	//int attribPosition = glGetAttribLocation(shader, "a_Position");
+	//glEnableVertexAttribArray(attribPosition);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle_Lecture4_5);
+	//glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0);
+	//
+	//int attribColor = glGetAttribLocation(shader, "a_Color");
+	//glEnableVertexAttribArray(attribColor);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBOManyParticle_Lecture4_5);
+	//glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLuint*)(sizeof(float) * 3));
+
+	// [3. 버텍스 셰이더 입력 데이터 패킹 - Array로 모든 포지션을 가장 먼저 입력 후에 마지막으로 색상을 순서대로 입력하는 방법으로 패킹하여 셰이더로 넘겨준다.]
+	int attribPosition = glGetAttribLocation(shader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOPack1);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	int attribColor = glGetAttribLocation(shader, "a_Color");
+	glEnableVertexAttribArray(attribColor);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOPack1);
+	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLuint*)(sizeof(float) * 18));
 
 	int uniformPoints = glGetUniformLocation(shader, "u_Points");
 	glUniform3fv(uniformPoints, 10, g_points); // v: array형태로 넘기겠다.

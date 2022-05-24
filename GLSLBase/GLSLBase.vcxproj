@@ -182,6 +182,10 @@
     <None Include="Shaders\lecture4_2particle.vs" />
     <None Include="Shaders\lecture4_3particle.fs" />
     <None Include="Shaders\lecture4_3particle.vs" />
+    <None Include="Shaders\lecture4_4particle.fs" />
+    <None Include="Shaders\lecture4_4particle.vs" />
+    <None Include="Shaders\lecture4_5particle.fs" />
+    <None Include="Shaders\lecture4_5particle.vs" />
     <None Include="Shaders\SolidRect.fs" />
     <None Include="Shaders\SolidRect.vs" />
     <None Include="Shaders\SolidRectCopy.fs" />
